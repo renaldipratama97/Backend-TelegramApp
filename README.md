@@ -22,7 +22,7 @@ npm install
 ## Setup .ENV Setup
 Create .env file in your root project folder.<br>
 ```bash
-PORT = 4000
+PORT = 5000
 DB_HOST = localhost
 DB_NAME = telegram-app
 DB_USER = root
