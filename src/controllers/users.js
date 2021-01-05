@@ -7,6 +7,46 @@ const { response } = require('../helpers/response')
 const usersModels = require('../models/users')
 
 const usersController =  {
+    getAllUsers: (req, res, next) => {
+        usersModels.getAllUsers()
+        .then(result => {
+            response(res, result,{ status: 'succeed', statusCode: '200' }, null)
+        })
+        .catch(() => {
+            const error = new createError(500, 'Looks like server having trouble')
+            return next(error)
+        })
+    },
+    getFriendList: (req, res, next) => {
+        const idUser = req.params.idUser
+        usersModels.getFriendList(idUser)
+        .then(result => {
+            response(res, result,{ status: 'succeed', statusCode: '200' }, null)
+        })
+        .catch(() => {
+            const error = new createError(500, 'Looks like server having trouble')
+            return next(error)
+        })
+    },
+    getUserById: (req, res, next) => {
+        const idUser = req.params.idUser
+        if(!idUser){
+            const error = new createError(400, 'Id user cannot be empty')
+            return next(error)
+        }
+        usersModels.getUserById(idUser)
+        .then(results => {
+            if(results.length < 1){
+                const error = new createError(400, 'Id user cannot be empty')
+                return next(error)
+            }
+            response(res, results[0], { status: 'succeed', statusCode: 200 }, null)
+        })
+        .catch(() => {
+            const error = new createError(500, 'Looks like server having trouble')
+            return next(error)
+        })
+    },
     registerUsers: (req, res, next) => {
         const id = uuidv4()
         const { username, email, password } = req.body
@@ -24,6 +64,7 @@ const usersController =  {
                         username,
                         email,
                         password: hash,
+                        status: '',
                         createdAt: new Date()
                     }
                     
@@ -68,6 +109,7 @@ const usersController =  {
                 // refreshtoken
                 jwt.sign({ userId: user.id, email: user.email }, process.env.REFRESH_TOKEN_KEY, { expiresIn: '48h' }, function (err, refreshToken) {
                     const responseMessage = {
+                        id: user.id,
                         accessToken: accessToken,
                         refreshToken: refreshToken
                     }
@@ -78,6 +120,114 @@ const usersController =  {
                 })
             })
         })
+        })
+    },
+    updatePhotoProfile: (req, res, next) => {
+        const id = req.params.idUser
+
+        data = {
+            picture: `${process.env.BASE_URL}/upload/${req.file.filename}`
+        }
+        usersModels.updatePhotoProfile(id, data)
+        .then(result => {
+            const resultUser = result
+            response(res, {message: 'Data has been updated'}, {
+                status: 'succeed',
+                statusCode: 200
+            }, null)
+        })
+        .catch(err => {
+            console.log(err)
+            const error = new createError(500, 'Looks like server having trouble')
+            return next(error)
+        })
+    },
+    updatePhones: (req, res, next) => {
+        const id = req.params.idUser
+        const { phonenumber } = req.body
+        const data = {
+            phonenumber
+        }
+        usersModels.updatePhones(id, data)
+        .then(result => {
+            const resultUser = result
+            response(res, {message: 'Data has been updated'}, {
+                status: 'succeed',
+                statusCode: 200
+            }, null)
+        })
+        .catch(err => {
+            console.log(err)
+            const error = new createError(500, 'Looks like server having trouble')
+            return next(error)
+        })
+    },
+    onlineUser: (req, res, next) => {
+        const id = req.params.idUser
+        usersModels.updateStatusOnline(id)
+        .then(result => {
+            const resultUser = result
+            response(res, {message: 'Status user has been updated (Online)'}, {
+                status: 'succeed',
+                statusCode: 200
+            }, null)
+        })
+        .catch(err => {
+            console.log(err)
+            const error = new createError(500, 'Looks like server having trouble')
+            return next(error)
+        })
+    },
+    offlineUser: (req, res, next) => {
+        const id = req.params.idUser
+        usersModels.updateStatusOffline(id)
+        .then(result => {
+            const resultUser = result
+            response(res, {message: 'Status user has been updated (Offline)'}, {
+                status: 'succeed',
+                statusCode: 200
+            }, null)
+        })
+        .catch(err => {
+            console.log(err)
+            const error = new createError(500, 'Looks like server having trouble')
+            return next(error)
+        })
+    },
+    updateBio: (req, res, next) => {
+        const id = req.params.idUser
+        const { bio } = req.body
+        const data = {
+            bio
+        }
+        usersModels.updateBio(id, data)
+        .then(result => {
+            const resultUser = result
+            response(res, {message: 'Data has been updated'}, {
+                status: 'succeed',
+                statusCode: 200
+            }, null)
+        })
+        .catch(err => {
+            console.log(err)
+            const error = new createError(500, 'Looks like server having trouble')
+            return next(error)
+        })
+    },
+    deleteUser: (req, res, next) => {
+        const id = req.params.idUser
+        usersModels.deleteUser(id)
+        .then(result => {
+            const resultUser = result
+            response(res, {message: 'Delete success'}, {
+                status: 'succeed',
+                statusCode: 200
+            }, null)
+        })
+        .catch(err => {
+            console.log(err)
+            const error = new createError(500, 'Looks like server having trouble')
+            return next(error)
         })
     }
 }

@@ -1,6 +1,15 @@
 const { actionQuery } = require('../helpers/actionQuery')
 
 const usersModels = {
+    getAllUsers: () => {
+        return actionQuery('SELECT * FROM users')
+    },
+    getFriendList: (idUser) => {
+        return actionQuery('SELECT * FROM users WHERE id != ?', idUser)
+    },
+    getUserById: (idUser) => {
+        return actionQuery('SELECT * FROM users WHERE id = ?', idUser)
+    },
     checkUsers: (email) => {
         return actionQuery('SELECT * FROM users WHERE email = ?', email)
     },
@@ -10,8 +19,23 @@ const usersModels = {
     deleteUser: (idUser) => {
         return actionQuery('DELETE FROM users WHERE id = ?', idUser)
     },
-    updateUser: (id, data) => {
-        return actionQuery(`UPDATE users SET email = '${data.email}', phoneNumber = '${data.phoneNumber}', gender = '${data.gender}', username = '${data.username}', firstName = '${data.firstName}', lastName = '${data.lastName}', bornDate = '${data.bornDate}', address = '${data.address}', photoProfile = '${data.photoProfile}', updatedAt = '${data.updatedAt}' WHERE id = ?`, id)
+    updatePhones: (id, data) => {
+        return actionQuery(`UPDATE users SET ? WHERE id = ?`, [data,id])
+    },
+    updateBio: (id, data) => {
+        return actionQuery(`UPDATE users SET ? WHERE id = ?`, [data,id])
+    },
+    updatePhotoProfile: (id, data) => {
+        return actionQuery(`UPDATE users SET ? WHERE id = ?`, [data, id])
+    },
+    updateStatusOnline: (id) => {
+        return actionQuery(`UPDATE users SET status = 'Online' WHERE id = ?`, id)
+    },
+    updateStatusOffline: (id) => {
+        return actionQuery(`UPDATE users SET status = 'Offline' WHERE id = ?`, id)
+    },
+    deleteUser: (id) => {
+        return actionQuery(`DELETE FROM users WHERE id = ?`, id)
     }
 }
 
